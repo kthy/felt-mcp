@@ -1,0 +1,78 @@
+[project]
+name = "felt-mcp"
+version = "0.1.0"
+description = "Add your description here"
+classifiers = ["Private :: Do Not Upload"]
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "httpx>=0.28.1",
+    "mcp[cli]>=1.26.0",
+    "structlog>=25.1.0",
+]
+
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[tool.coverage.run]
+relative_files = true
+
+[tool.licensecheck]
+format = "simple"
+groups = ["dev"]
+ignore_licenses = ["MPL-2.0", "ZLIB"]
+ignore_packages = ["certifi", "configator", "igraph"]
+skip_dependencies = ["google-crc32c", "llvmlite", "mypy-extensions"]
+zero = true
+
+[tool.pyright]
+defineConstant = { PYPY = false }
+
+[tool.pytest.ini_options]
+minversion = "9.0"
+filterwarnings = [
+  "error",
+]
+addopts = "--cov-branch --cov-report xml:coverage.xml --cov-report term-missing:skip-covered --cov=src/felt_mcp"
+testpaths = [
+  "tests",
+]
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 99
+target-version = "py314"
+
+[tool.ruff.lint]
+select = [
+  "A", "B", "C", "C4", "C90", "DTZ", "E", "F", "FAST", "FBT", "FURB",
+  "I", "N", "NPY", "PD", "PERF", "PYI", "RUF", "S", "SIM", "T20"
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["S101"]
+
+[tool.ty.terminal]
+error-on-warning = true
+
+[dependency-groups]
+dev = [
+  "pytest",
+  "pytest-asyncio",
+  "pytest-cov",
+  "pytest-skip-slow",
+  "respx",
+  "rich",
+  "ruff",
+  "skylos",
+  "twine",
+  "ty",
+]
+
+[tool.uv]
+environments = [
+  "sys_platform == 'darwin'",
+  "sys_platform == 'linux'",
+]
+package = true

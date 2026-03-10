@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          python-version: "3.14"
+      - run: uv sync --frozen
+      - name: Format check
+        run: uv run ruff format --check src/
+      - name: Lint check
+        run: uv run ruff check src/
+      - name: Type check
+        run: uv run ty check src/
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          python-version: "3.14"
+      - run: uv sync --frozen
+      - name: Run tests
+        run: uv run -m pytest
+      - name: SonarQube scan
+        uses: SonarSource/sonarqube-scan-action@master # zizmor: ignore[unpinned-uses]
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
