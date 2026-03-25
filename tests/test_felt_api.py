@@ -4,7 +4,7 @@ import httpx
 import pytest
 import respx
 
-from felt_mcp.felt_api import FELT_API_BASE, get_maps
+from felt_mcp.felt_api import FELT_API_BASE, create_map, get_map, get_maps
 
 
 @pytest.fixture(autouse=True)
@@ -91,3 +91,76 @@ async def test_get_maps_raises_without_token(monkeypatch: pytest.MonkeyPatch) ->
     monkeypatch.delenv("FELT_API_TOKEN")
     with pytest.raises(ValueError, match="FELT_API_TOKEN"):
         await get_maps()
+
+
+# --- get_map tests ---
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_get_map_returns_map_details() -> None:
+    map_data = {
+        "id": "map-1",
+        "title": "Test Map",
+        "url": "https://felt.com/map/test-map",
+        "public_access": "private",
+        "layers": [{"id": "layer-1", "name": "Points"}],
+        "project_id": "proj-1",
+    }
+    respx.get(f"{FELT_API_BASE}/maps/map-1").mock(
+        return_value=httpx.Response(200, json=map_data)
+    )
+
+    result = await get_map("map-1")
+
+    assert result["id"] == "map-1"
+    assert result["title"] == "Test Map"
+    assert result["layers"] == [{"id": "layer-1", "name": "Points"}]
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_get_map_raises_on_not_found() -> None:
+    respx.get(f"{FELT_API_BASE}/maps/bad-id").mock(
+        return_value=httpx.Response(404, json={"error": "not found"})
+    )
+
+    with pytest.raises(httpx.HTTPStatusError):
+        await get_map("bad-id")
+
+
+# --- create_map tests ---
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_create_map_with_title() -> None:
+    created = {
+        "id": "map-new",
+        "title": "My New Map",
+        "url": "https://felt.com/map/my-new-map",
+        "public_access": "private",
+    }
+    route = respx.post(f"{FELT_API_BASE}/maps").mock(
+        return_value=httpx.Response(200, json=created)
+    )
+
+    result = await create_map(title="My New Map")
+
+    assert result["id"] == "map-new"
+    assert result["title"] == "My New Map"
+    request_json = route.calls[0].request.content
+    assert b"My New Map" in request_json
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_create_map_minimal() -> None:
+    created = {"id": "map-min", "title": "Untitled Map", "url": "https://felt.com/map/map-min"}
+    respx.post(f"{FELT_API_BASE}/maps").mock(
+        return_value=httpx.Response(200, json=created)
+    )
+
+    result = await create_map()
+
+    assert result["id"] == "map-min"

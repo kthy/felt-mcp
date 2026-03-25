@@ -23,6 +23,38 @@ def _auth_headers() -> dict[str, str]:
     return {"Authorization": f"Bearer {_get_api_token()}"}
 
 
+async def get_map(map_id: str) -> dict[str, object]:
+    """Fetch details for a single map."""
+    async with httpx.AsyncClient(base_url=FELT_API_BASE, headers=_auth_headers()) as client:
+        resp = await client.get(f"/maps/{map_id}")
+        resp.raise_for_status()
+        return resp.json()
+
+
+async def create_map(
+    title: str | None = None,
+    *,
+    lat: float | None = None,
+    lon: float | None = None,
+    zoom: int | None = None,
+) -> dict[str, object]:
+    """Create a new map."""
+    body: dict[str, object] = {}
+    if title is not None:
+        body["title"] = title
+    if lat is not None:
+        body["lat"] = lat
+    if lon is not None:
+        body["lon"] = lon
+    if zoom is not None:
+        body["zoom"] = zoom
+
+    async with httpx.AsyncClient(base_url=FELT_API_BASE, headers=_auth_headers()) as client:
+        resp = await client.post("/maps", json=body)
+        resp.raise_for_status()
+        return resp.json()
+
+
 async def get_maps() -> list[dict[str, object]]:
     """Fetch all maps accessible to the authenticated user.
 

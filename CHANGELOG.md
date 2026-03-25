@@ -8,7 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-…
+- feat: `get_map_details` tool to retrieve a single map with layers and elements
+- feat: `get_map_layers` tool to list layers on a map
+- feat: `create_new_map` tool to create a new Felt map
 
 ### Changed
 

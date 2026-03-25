@@ -72,6 +72,33 @@ Or with Docker:
 
 Lists all maps accessible to the authenticated Felt user. Returns maps from all projects with their id, title, URL, project, and access level.
 
+### `get_map_details`
+
+Get details for a specific Felt map, including its layers, elements, and settings.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `map_id`  | string | Yes | The ID of the map to retrieve |
+
+### `get_map_layers`
+
+List all layers on a specific Felt map.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `map_id`  | string | Yes | The ID of the map whose layers to list |
+
+### `create_new_map`
+
+Create a new Felt map with an optional title and initial viewport.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `title`   | string | No | Title for the new map |
+| `lat`     | float  | No | Initial latitude |
+| `lon`     | float  | No | Initial longitude |
+| `zoom`    | int    | No | Initial zoom level |
+
 ## Development
 
 ```bash
