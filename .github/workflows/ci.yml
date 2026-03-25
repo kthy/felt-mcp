@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint:
     name: Lint
@@ -44,4 +48,4 @@ jobs:
       - name: SonarQube scan
         uses: SonarSource/sonarqube-scan-action@master # zizmor: ignore[unpinned-uses]
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # zizmor: ignore[secrets-outside-env]

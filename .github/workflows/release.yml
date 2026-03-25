@@ -6,7 +6,10 @@ on:
 
 permissions:
   contents: read
-  packages: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.release.tag_name || github.ref }}
+  cancel-in-progress: false
 
 env:
   REGISTRY: ghcr.io
@@ -16,6 +19,8 @@ jobs:
   docker:
     name: Build and push Docker image
     runs-on: ubuntu-latest
+    permissions:
+      packages: write # Push container images to GHCR
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
