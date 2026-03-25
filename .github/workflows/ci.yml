@@ -46,6 +46,6 @@ jobs:
       - name: Run tests
         run: uv run -m pytest
       - name: SonarQube scan
-        uses: SonarSource/sonarqube-scan-action@master # zizmor: ignore[unpinned-uses]
+        uses: SonarSource/sonarqube-scan-action@9598b8a83feef37de07f549027fab50ecffe6a6e # master # zizmor: ignore[unpinned-uses]
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # zizmor: ignore[secrets-outside-env]
